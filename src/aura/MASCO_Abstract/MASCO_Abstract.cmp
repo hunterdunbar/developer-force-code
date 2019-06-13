@@ -1,0 +1,502 @@
+<aura:component controller="MAS_AbstractController" implements="forceCommunity:availableForAllPageTypes"
+                access="global" description="Component for Manage Abstract records"
+                extends="c:MASCO_SObjectListManager">
+
+    <!-- DETAIL VIEW PARAMETERS -->
+    <aura:attribute name="abstract" type="MAS_Abstract__c"
+                    default="{ 'sobjectType': 'MAS_Abstract__c' }"
+                    description="Abstract object for detail view"/>
+    <aura:attribute name="abstractId" type="String" default=""
+                    description="Id of Abstract in detail view"/>
+    <aura:attribute name="userRole" type="String" default=""
+                    description="User Role (Student/Advisor)"/>
+    <aura:attribute name="readOnly" type="String" default="true"
+                    description="Readonly fields (for Advisor)"/>
+    <aura:attribute name="readerFields" type="List" default="[]"
+                    description="Fields for Search readers"/>
+
+
+    <!-- ADD READER MODAL PARAMETERS -->
+    <aura:attribute name="newReader" type="Contact"
+                    default="{ 'sobjectType': 'Contact' }"
+                    description="New Reader object for Modal window"/>
+    <aura:attribute name="newReaderType" type="String"
+                    default="1"
+                    description="New Reader type for Modal window (Reader 1 - 1 or Reader 2 - 2)"/>
+    <aura:attribute name="showModal" type="Boolean" default="false"
+                    description="Show or Hide add Reader Modal"/>
+
+
+    <!-- DATATABLE PARAMETERS -->
+    <aura:attribute name="wait" type="boolean" default="true" description="Flag for delayed loading"/>
+    <aura:attribute name="objectName" type="string" default="MAS_Abstract__c"
+                    description="Object name for SObjectListManager"/>
+    <aura:attribute name="filterCode" type="string" default="AbstractList"
+                    description="Filter Code for SObjectListManager"/>
+    <aura:attribute name="pageSet" type="List" default="[{'pageNumber':1, 'pageSize':50}]"
+                    description="Page Set for SObjectListManager"/>
+
+    <aura:attribute name="fieldSet" type="List" default="[
+            {'name':'MAS_Student__r.Name', 'label':'Student Name', 'sortable':true,  'type': 'object', 'params':{'object':'MAS_Student__r', 'field':['Name']},},
+            {'name':'MAS_Title__c', 'label':'Plan of Study', 'sortable':false, 'type' : 'realLink', 'link': 'abstract', 'staticName' : 'View Abstract', 'dataField': 'MAS_Student__c'},
+            {'name':'MAS_Status__c', 'label':'Status', 'sortable':true}
+        ]" description="Field Set for Abstract table"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+
+    <!-- ADD NEW READER MODAL -->
+    <aura:if isTrue="{!v.showModal}">
+        <div class="demo-only" style="height: 640px;">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                     aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button onclick="{!c.hideModal}"
+                                class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                title="Close">
+                            <c:MASCO_SvgIcon svgPath="{!$Resource.SLDS252 + '/icons/utility-sprite/svg/symbols.svg#close'}"
+                                    category="utility" size="small"
+                                    name="close"></c:MASCO_SvgIcon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Add New Reader</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-form slds-form_compound plan-of-study-form slds-m-top--medium">
+                            <fieldset class="slds-form-element">
+                                <legend class="slds-form-element__legend slds-form-element__label">
+                                    Please complete the following required fields to add new Reader to the system.
+                                </legend>
+                                <div class="slds-form-element__group">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element slds-size_1-of-2">
+                                            <label class="slds-form-element__label" for="FirstName">First Name</label>
+                                            <div class="slds-form-element__control">
+                                                <ui:inputText aura:id="FirstName" change="{!c.inputChange}"
+                                                              value="{!v.newReader.FirstName}" class="slds-input"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element slds-size_1-of-2">
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label"
+                                                       for="LastName">
+                                                    Last Name
+                                                </label>
+                                                <div class="slds-form-element__control">
+                                                    <ui:inputText aura:id="LastName" change="{!c.inputChange}"
+                                                                  value="{!v.newReader.LastName}" class="slds-input"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element slds-size_1-of-2">
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label"
+                                                       for="Email">
+                                                    Email Address
+                                                </label>
+                                                <div class="slds-form-element__control">
+                                                    <ui:inputText aura:id="Email" change="{!c.inputChangeEmail}"
+                                                                  value="{!v.newReader.Email}" class="slds-input"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element slds-size_1-of-2">
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label"
+                                                       for="MAS_Reader_Bio__c">
+                                                    Short Bio
+                                                </label>
+                                                <div class="slds-form-element__control">
+                                                    <ui:inputTextArea aura:id="MAS_Reader_Bio__c"
+                                                                      change="{!c.inputChange}"
+                                                                      value="{!v.newReader.MAS_Reader_Bio__c}"></ui:inputTextArea>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button onclick="{!c.hideModal}" class="slds-button slds-button_neutral">Cancel</button>
+                        <button id="addNewReaderButton" onclick="{!c.addNewReader}"
+                                class="slds-button slds-button_brand">Save
+                        </button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+
+
+    <!-- TABLE VIEW FOR ADVISOR -->
+    <aura:if isTrue="{!and(v.userRole=='Advisor', v.abstractId=='')}">
+
+        <!-- ADVISOR TABLE DETAIL PANEL -->
+        <div class="slds-page-header slds-p-top--none">
+            <div class="slds-grid slds-page-header__detail-row bordered slds-p-left--x-large slds-m-top--none">
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Serial #">Plan of Study
+                        Status</p>
+                    <p class="slds-text-body--regular slds-truncate"
+                       title="">Not Started</p>
+                </div>
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Item #">Student Advisor</p>
+                    <p class="slds-text-body--regular"
+                       title="">John Anderson</p>
+                </div>
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Item Desc.">Field 3</p>
+                    <p class="slds-text-body--regular"
+                       title="">Hyperlink e.g.</p>
+                </div>
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Item Instance">Field 4</p>
+                    <p>
+                        <span title="">Listing Only</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- DATATABLE -->
+        <div class="mas-body-layout">
+            <span class="slds-text-heading_large">MY STUDENTS</span>
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-m-top--large">
+                <thead>
+                <tr class="slds-text-title--caps">
+                    <c:MASCO_SortingComponent fieldSet="{!v.fieldSet}"/>
+                </tr>
+                </thead>
+                <c:MASCO_TableRender objectSet="{!v.objects}"
+                                     fieldSet="{!v.fieldSet}" pageSet="{!v.pageSet}"/>
+            </table>
+            <div class="slds-m-around--medium">
+                <c:MASCO_PaginationComponent page="{!v.pageSet[0].pageNumber}" pageSize="{!v.pageSet[0].pageSize}"
+                                             totalCount="{!v.totalCount}"/>
+            </div>
+        </div>
+    </aura:if>
+
+
+    <!-- DETAIL VIEW -->
+    <aura:if isTrue="{!v.abstractId!=''}">
+
+        <!-- DETAIL PANEL -->
+        <div class="slds-page-header slds-p-top--none">
+            <div class="slds-grid slds-page-header__detail-row bordered slds-p-left--x-large slds-m-top--none">
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Abstract Status">
+                        Abstract Status
+                    </p>
+                    <p class="slds-text-body--regular slds-truncate"
+                       title="{!v.abstract.MAS_Status__c ? v.abstract.MAS_Status__c : 'Unreviewed'}">
+                            {!v.abstract.MAS_Status__c ? v.abstract.MAS_Status__c : 'Unreviewed'}
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- CONTENT BLOCK -->
+        <div class="mas-body-layout">
+            <div class="slds-grid slds-size--1-of-1">
+
+
+                <!-- FORM -->
+                <div class="slds-col slds-p-right--large slds-size--2-of-3">
+
+
+                    <!-- FORM TITLE -->
+                    <span class="slds-text-heading_large">Abstract</span>
+
+
+                    <div class="slds-form slds-form_compound plan-of-study-form slds-m-top--medium">
+                        <fieldset class="slds-form-element">
+                            <legend class="slds-form-element__legend slds-form-element__label">
+                                Below are details field in by the student.
+                            </legend>
+
+                            <div class="slds-form-element__group">
+                                <div class="slds-form-element__row">
+                                    <div class="slds-form-element slds-size_1-of-1">
+                                        <label class="slds-form-element__label" for="MAS_Title__c">
+                                            <abbr class="slds-required" title="required">*</abbr>Abstract Title</label>
+                                        <div class="slds-form-element__control">
+                                            <ui:inputText change="{!c.inputChange}" disabled="{!v.readOnly}"
+                                                          aura:id="MAS_Title__c"
+                                                          value="{!v.abstract.MAS_Title__c}"
+                                                          class="slds-input"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="slds-form-element__row slds-p-right--x-small">
+                                    <div class="slds-form-element slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <label class="slds-form-element__label"
+                                                   for="MAS_1st_Choice_Area_of_Concentration__c">
+                                                <abbr class="slds-required" title="required">*</abbr>Primary Area of
+                                                Concentration
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-select_container">
+                                                    <select disabled="{!v.readOnly}"
+                                                            class="slds-select"
+                                                            id="MAS_1st_Choice_Area_of_Concentration__c">
+                                                        <option value="">Select an Option</option>
+                                                        <option value="Design"
+                                                                selected="{!v.abstract.MAS_1st_Choice_Area_of_Concentration__c == 'Design'}">
+                                                            Design
+                                                        </option>
+                                                        <option value="Engineering"
+                                                                selected="{!v.abstract.MAS_1st_Choice_Area_of_Concentration__c == 'Engineering'}">
+                                                            Engineering
+                                                        </option>
+                                                        <option value="Science"
+                                                                selected="{!v.abstract.MAS_1st_Choice_Area_of_Concentration__c == 'Science'}">
+                                                            Science
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <label class="slds-form-element__label"
+                                                   for="MAS_2nd_Choice_Area_of_Concentration__c">
+                                                <abbr class="slds-required" title="required">*</abbr>Secondary Area of
+                                                Concentration
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-select_container">
+                                                    <select disabled="{!v.readOnly}"
+                                                            class="slds-select"
+                                                            id="MAS_2nd_Choice_Area_of_Concentration__c">
+                                                        <option value="">Select an Option</option>
+                                                        <option value="Design"
+                                                                selected="{!v.abstract.MAS_2nd_Choice_Area_of_Concentration__c == 'Design'}">
+                                                            Design
+                                                        </option>
+                                                        <option value="Engineering"
+                                                                selected="{!v.abstract.MAS_2nd_Choice_Area_of_Concentration__c == 'Engineering'}">
+                                                            Engineering
+                                                        </option>
+                                                        <option value="Science"
+                                                                selected="{!v.abstract.MAS_2nd_Choice_Area_of_Concentration__c == 'Science'}">
+                                                            Science
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size--1-of-1">
+                                <label class="slds-form-element__label" for="MAS_Abstract__c">
+                                    <abbr class="slds-required" title="required">*</abbr>Abstract input
+                                </label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputTextArea change="{!c.inputChange}" disabled="{!v.readOnly}"
+                                                      aura:id="MAS_Abstract__c"
+                                                      value="{!v.abstract.MAS_Abstract__c}"></ui:inputTextArea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-m-top--large slds-p-bottom--large slds-m-bottom--large">
+                        <span class="slds-text-heading_large">Readers</span>
+                        <fieldset class="slds-form-element">
+                            <legend class="slds-form-element__legend slds-form-element__label">
+                                Below are details field in by the student.
+                            </legend>
+                            <div class="slds-form-element__group">
+                                <div class="slds-form-element__row">
+                                    <div class="mas-reader-field slds-form-element slds-size_1-of-1">
+                                        <div class="slds-form-element">
+                                            <label class="slds-form-element__label"
+                                                   for="combobox-unique-id-12">Reader 1</label>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-combobox_container slds-has-inline-listbox">
+                                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click"
+                                                         aria-expanded="true" aria-haspopup="listbox"
+                                                         role="combobox">
+                                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                                                             role="none">
+                                                            <input type="text"
+                                                                   class="slds-input slds-combobox__input"
+                                                                   aria-activedescendant="listbox-option-unique-id-01"
+                                                                   aria-autocomplete="list"
+                                                                   aria-controls="listbox-unique-id"
+                                                                   autocomplete="off" role="textbox"
+                                                                   readonly="readonly"
+                                                                   disabled="disabled"
+                                                                   value="{!v.abstract.MAS_Advisor__r.Name}"
+
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                    <aura:iteration items="{!v.readerFields}" var="readerField">
+
+                                        <div data-field-id="{!readerField.id}" class="mas-reader-field slds-form-element__row">
+                                        <div class="{!'slds-form-element ' +
+                                                     (v.userRole=='Student' ? (v.abstract.MAS_Status__c == 'Unreviewed' ? 'slds-size_5-of-6' :  (v.abstract.MAS_Status__c == 'Reviewed with Comments' ? 'slds-size_5-of-6' : 'slds-size_6-of-6'))  : 'slds-size_1-of-1')}">
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label"
+                                                       for="combobox-unique-id-12"><abbr class="slds-required"
+                                                                                         title="required">*</abbr> {!readerField.title}
+                                                </label>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-combobox_container slds-has-inline-listbox">
+                                                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click"
+                                                             aria-expanded="true" aria-haspopup="listbox"
+                                                             role="combobox">
+                                                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                                                                 role="none">
+                                                                <input type="text"
+                                                                       class="slds-input slds-combobox__input"
+                                                                       id="{!'readerSearch' + readerField.id}"
+                                                                       aria-activedescendant="listbox-option-unique-id-01"
+                                                                       aria-autocomplete="list"
+                                                                       aria-controls="listbox-unique-id"
+                                                                       autocomplete="off" role="textbox"
+                                                                       placeholder="Search"
+                                                                       data-id="{!readerField.id}"
+                                                                       readonly="{!readerField.selected}"
+                                                                       disabled="{!v.readOnly}"
+                                                                       value="{!readerField.selected ? readerField.selected : this.value}"
+                                                                       onkeyup="{!c.search}"
+                                                                />
+                                                                <button onclick="{!c.clearReaderSearch}"
+                                                                        id="{!'removeSelected' + readerField.id}"
+                                                                        class="{!'slds-button slds-button_icon slds-input__icon slds-input__icon_right' + (readerField.selected == false || v.readOnly ? ' slds-hidden' : '')}"
+                                                                        title="Remove selected option">
+                                                                    <c:MASCO_SvgIcon svgPath="{!$Resource.SLDS252 + '/icons/utility-sprite/svg/symbols.svg#close'}"
+                                                                            category="utility" size="xx-small"
+                                                                            name="close"></c:MASCO_SvgIcon>
+                                                                    <span class="slds-assistive-text">Remove selected option</span>
+                                                                </button>
+                                                            </div>
+                                                            <div id="listbox-unique-id" role="listbox">
+                                                                <ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid"
+                                                                    role="presentation">
+
+                                                                    <aura:iteration items="{!readerField.readers}"
+                                                                                    var="reader">
+                                                                        <li role="presentation"
+                                                                            class="slds-listbox__item">
+                                                                            <div data-reader-id="{!reader.Id}"
+                                                                                 data-reader-name="{!reader.Name}"
+                                                                                 class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta slds-has-focus"
+                                                                                 onclick="{!c.selectReader}"
+                                                                                 role="option">
+
+                                                                            <span class="slds-media__body">
+                                                                                <span class="slds-listbox__option-text slds-listbox__option-text_entity">{!reader.Name}</span>
+                                                                            </span>
+                                                                            </div>
+                                                                        </li>
+                                                                    </aura:iteration>
+
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                            <aura:if isTrue="{!and(v.userRole=='Student', or(v.abstract.MAS_Status__c == 'Unreviewed', v.abstract.MAS_Status__c == 'Reviewed with Comments'))}">
+
+                                                <div class="slds-size_1-of-6">
+                                                <button style="margin-top: 1.3rem;" class="slds-button slds-button--brand slds-float--right"
+                                                        onclick="{!c.showModal}">
+                                                    Add New
+                                                </button>
+
+                                                </div>
+                                            </aura:if>
+                                        </div>
+                                    </aura:iteration>
+                            </div>
+                        </fieldset></div>
+
+                        <!-- ADVISOR ACTION BUTTONS -->
+                        <aura:if isTrue="{!v.userRole=='Advisor'}">
+                            <a href="#abstract"
+                               class="slds-button slds-button_neutral slds-m-top_large slds-m-right_medium">
+                                Back to List
+                            </a>
+                            <aura:if isTrue="{!v.abstract.MAS_Status__c == 'Submitted'}">
+                                <button class="slds-button slds-button_brand slds-m-top_large slds-m-right_medium"
+                                        onclick="{!c.approveAbstract}">
+                                    Acknowledge
+                                </button>
+                            </aura:if>
+                            <aura:if isTrue="{!v.abstract.MAS_Status__c == 'Acknowledge by Advisor'}">
+                                <button class="slds-button slds-button_brand slds-m-top_large slds-m-right_medium"
+                                        onclick="{!c.resubmitAbstract}">
+                                    Resubmit With Comments
+                                </button>
+                            </aura:if>
+                        </aura:if>
+
+
+                        <!-- STUDENT ACTION BUTTONS -->
+                        <aura:if isTrue="{!and(v.userRole=='Student', or(v.abstract.MAS_Status__c == 'Unreviewed', v.abstract.MAS_Status__c == 'Reviewed with Comments'))}">
+                            <button class="slds-button slds-button_neutral slds-m-top_large slds-m-right_medium"
+                                    onclick="{!c.saveAbstract}">
+                                Save
+                            </button>
+                            <button class="slds-button slds-button_brand slds-m-top_large slds-m-right_medium"
+                                    onclick="{!c.submitAbstract}">
+                                Submit
+                            </button>
+                        </aura:if>
+                    </div>
+                </div>
+
+
+                <!-- FORCE CHATTER BLOCK -->
+                <div class="slds-col slds-p-right--large slds-size--1-of-3">
+                    <aura:if isTrue="{!v.abstract.Id}">
+                        <span class="slds-text-heading_large">Feed</span>
+                        <div class="slds-m-top--large slds-p-top--small">
+
+                            <aura:if isTrue="{!v.userRole=='Advisor'}">
+                                <forceChatter:publisher context="RECORD" recordId="{!v.abstract.Id}"/>
+                            </aura:if>
+                            <forceChatter:feed type="Record" subjectId="{!v.abstract.Id}"/>
+                        </div>
+
+                    </aura:if>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

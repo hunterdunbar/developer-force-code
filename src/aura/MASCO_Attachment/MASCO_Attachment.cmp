@@ -1,0 +1,30 @@
+<aura:component controller="MAS_FileController" description="Component for uploading attachments">
+
+    <aura:attribute name="parentId" type="Id" description="Id of Proposal for getting List of attachments"/>
+    <aura:attribute name="viewMode" type="boolean" default="false" description="Flag for View Mode"/>
+    <aura:attribute name="loading" type="integer" default="0" description="Value of ProgressBar"/>
+
+    <aura:registerEvent name="actionEvent" type="c:MASCO_ActionEvent"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.parentId}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.viewMode}" action="{!c.changeViewMode}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <lightning:spinner variant="brand" alternativeText="loading..." aura:id="spinner" class="app-spinner" size="large"/>
+
+            <aura:if isTrue="{!!v.viewMode}">
+
+                <!--PROGRESSBAR-->
+                <div class="slds-progress slds-m-horizontal--xxx-small slds-m-top--small">
+                    <div class="slds-progress-bar">
+                    <span class="slds-progress-bar__value" style="{!'width:'+v.loading+'%'}">
+                        <span id="upload-assistive-text" class="slds-assistive-text"></span>
+                    </span>
+                    </div>
+                </div>
+                <iframe src="../apex/MASCO_Attachments"
+                        width="100%" height="66px" style="min-width: 320px; background:#f4f6f9; border:none;"></iframe>
+
+            </aura:if>
+
+</aura:component>

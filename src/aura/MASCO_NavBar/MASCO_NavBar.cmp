@@ -1,0 +1,47 @@
+<aura:component extends="forceCommunity:navigationMenuBase" implements="forceCommunity:availableForAllPageTypes"
+                description="Component for Navigation Menu"
+                access="global">
+    <ltng:require scripts="{!$Resource.MASResources + '/scripts/jquery-3.3.1.min.js'}" afterScriptsLoaded="{!c.doInit}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.routeChange}"/>
+    <aura:attribute name="items" type="List" default="[
+            {'id': 0, 'label': 'Dashboard', 'url': ''},
+            {'id': 1, 'label': 'Plan of Study', 'url': 'plan-of-study', 'otherUrl':['plan-of-study-view']},
+            {'id': 2, 'label': 'Summer Plans', 'url': 'summer-plans'},
+            {'id': 3, 'label': 'Abstract', 'url': 'abstract'},
+            {'id': 4, 'label': 'Crit Day', 'url': 'crit-day'},
+            {'id': 5, 'label': 'Proposal', 'url': 'proposal'},
+        ]" description="List of menu items"/>
+    <aura:attribute name="active" type="integer" default="0" description="Id of active item"/>
+
+
+    <div class="slds-context-bar slds-p-horizontal_x-large slds-p-vertical_small mas-nav">
+        <nav class="slds-context-bar__secondary" role="navigation">
+            <div class="mas-logo">
+                <img src="{!$Resource.MASResources+'/images/logo.jpg'}"/>
+            </div>
+            
+            <ul class="slds-grid">
+                <!-- MENU ITEMS FROM ITEMLIST -->
+                <aura:iteration items="{!v.items}" var="item">
+                    <li class="{!'slds-context-bar__item ' + (item.id==v.active ? 'slds-is-active' : '')}">
+                        <a data-menu-item-id="{!item.id}" href="{!'#'+item.url}"
+                           class="slds-context-bar__label-action">{!item.label}</a>
+                    </li>
+                </aura:iteration>
+            </ul>
+            
+        </nav>
+    </div>
+
+    <div class="mas-header slds-grid">
+        <div class="mas-header-pane">
+            <div class="mas-header-title">
+                <aura:iteration items="{!v.items}" var="item">
+                    <aura:if isTrue="{!item.id==v.active}">
+                            {!item.label}
+                    </aura:if>
+                </aura:iteration>
+            </div>
+        </div>
+    </div>
+</aura:component>

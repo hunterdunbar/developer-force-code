@@ -1,0 +1,184 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+<table class="slds-table slds-table_bordered slds-tree slds-table_tree" role="treegrid" aria-readonly="true">
+<thead>
+<tr class="slds-text-title_caps">
+<th class="slds-cell-buffer_left" scope="col">
+<div class="slds-grid slds-grid_vertical-align-center">
+<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small slds-m-right_x-small slds-shrink-none slds-table_tree__toggle" tabindex="-1" title="Expand all rows">
+
+    <lightning:icon size="x-small" iconName="utility:chevrondown"/>
+<span class="slds-assistive-text">Expand all rows</span>
+</button>
+<div class="slds-truncate" title="Account Name">Account Name</div>
+</div>
+</th>
+<th scope="col">
+<div class="slds-truncate" title="Employees">Employees</div>
+</th>
+<th scope="col">
+<div class="slds-truncate" title="Phone Number">Phone Number</div>
+</th>
+<th scope="col">
+<div class="slds-truncate" title="Account Owner">Account Owner</div>
+</th>
+<th scope="col">
+<div class="slds-truncate" title="Billing City">Billing City</div>
+</th>
+<th class="slds-cell-shrink" scope="col">
+<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" tabindex="-1" title="Show More">
+    <lightning:icon size="x-small" iconName="utility:down"/>
+
+<span class="slds-assistive-text">Show More</span>
+</button>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr aria-level="1" aria-posinset="1" aria-setsize="4" class="slds-hint-parent" tabindex="0">
+<th class="slds-tree__item" data-label="Account Name" scope="row">
+<button class="slds-button slds-button_icon slds-button_icon slds-button_icon-x-small slds-m-right_x-small slds-is-disabled" aria-hidden="true" tabindex="-1" title="Expand Rewis Inc">
+    <lightning:icon size="x-small" iconName="utility:chevronright"/>
+
+<span class="slds-assistive-text">Collapse Rewis Inc</span>
+</button>
+<div class="slds-truncate" title="Rewis Inc"><a href="javascript:void(0);" tabindex="-1">Rewis Inc</a></div>
+</th>
+<td data-label="Employees" role="gridcell">
+<div class="slds-truncate" title="3,100">3,100</div>
+</td>
+<td data-label="Phone Number" role="gridcell">
+<div class="slds-truncate" title="837-555-1212">837-555-1212</div>
+</td>
+<td data-label="Account Owner" role="gridcell">
+<div class="slds-truncate" title="Jane Doe"><a href="javascript:void(0);" tabindex="-1">Jane Doe</a></div>
+</td>
+<td data-label="Billing City" role="gridcell">
+<div class="slds-truncate" title="Phoenix, AZ">Phoenix, AZ</div>
+</td>
+<td class="slds-cell-shrink" role="gridcell">
+<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" tabindex="-1" title="More actions for Rewis Inc">
+    <lightning:icon size="x-small" iconName="utility:down"/>
+
+<span class="slds-assistive-text">More actions for Rewis Inc</span>
+</button>
+</td>
+</tr>
+<tr aria-expanded="true" aria-level="1" aria-posinset="2" aria-setsize="4" class="slds-hint-parent">
+<th class="slds-tree__item" data-label="Account Name" scope="row">
+<button class="slds-button slds-button_icon slds-button_icon slds-button_icon-x-small slds-m-right_x-small" aria-hidden="true" tabindex="-1" title="Collapse Acme Corporation">
+    <lightning:icon size="x-small" iconName="utility:chevronright"/>
+
+<span class="slds-assistive-text">Expand Acme Corporation</span>
+</button>
+<div class="slds-truncate" title="Acme Corporation"><a href="javascript:void(0);" tabindex="-1">Acme Corporation</a></div>
+</th>
+<td data-label="Employees" role="gridcell">
+<div class="slds-truncate" title="10,000">10,000</div>
+</td>
+<td data-label="Phone Number" role="gridcell">
+<div class="slds-truncate" title="837-555-1212">837-555-1212</div>
+</td>
+<td data-label="Account Owner" role="gridcell">
+<div class="slds-truncate" title="John Doe"><a href="javascript:void(0);" tabindex="-1">John Doe</a></div>
+</td>
+<td data-label="Billing City" role="gridcell">
+<div class="slds-truncate" title="San Francisco, CA">San Francisco, CA</div>
+</td>
+<td class="slds-cell-shrink" role="gridcell">
+<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" tabindex="-1" title="More actions for Acme Corporation">
+    <lightning:icon size="x-small" iconName="utility:down"/>
+
+<span class="slds-assistive-text">More actions for Acme Corporation</span>
+</button>
+</td>
+</tr>
+<tr aria-level="2" aria-posinset="1" aria-setsize="1" class="slds-hint-parent">
+<th class="slds-tree__item" data-label="Account Name" scope="row">
+<button class="slds-button slds-button_icon slds-button_icon slds-button_icon-x-small slds-m-right_x-small slds-is-disabled" aria-hidden="true" tabindex="-1" title="Expand Acme Corporation (Oakland)">
+    <lightning:icon size="x-small" iconName="utility:chevronright"/>
+
+<span class="slds-assistive-text">Collapse Acme Corporation (Oakland)</span>
+</button>
+<div class="slds-truncate" title="Acme Corporation (Oakland)"><a href="javascript:void(0);" tabindex="-1">Acme Corporation (Oakland)</a></div>
+</th>
+<td data-label="Employees" role="gridcell">
+<div class="slds-truncate" title="745">745</div>
+</td>
+<td data-label="Phone Number" role="gridcell">
+<div class="slds-truncate" title="837-555-1212">837-555-1212</div>
+</td>
+<td data-label="Account Owner" role="gridcell">
+<div class="slds-truncate" title="John Doe"><a href="javascript:void(0);" tabindex="-1">John Doe</a></div>
+</td>
+<td data-label="Billing City" role="gridcell">
+<div class="slds-truncate" title="New York, NY">New York, NY</div>
+</td>
+<td class="slds-cell-shrink" role="gridcell">
+<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" tabindex="-1" title="More actions for Acme Corporation (Oakland)">
+    <lightning:icon size="x-small" iconName="utility:down"/>
+
+<span class="slds-assistive-text">More actions for Acme Corporation (Oakland)</span>
+</button>
+</td>
+</tr>
+<tr aria-expanded="false" aria-level="1" aria-posinset="3" aria-setsize="4" class="slds-hint-parent">
+<th class="slds-tree__item" data-label="Account Name" scope="row">
+<button class="slds-button slds-button_icon slds-button_icon slds-button_icon-x-small slds-m-right_x-small" aria-hidden="true" tabindex="-1" title="Collapse Rohde Enterprises">
+    <lightning:icon size="x-small" iconName="utility:chevronright"/>
+
+<span class="slds-assistive-text">Expand Rohde Enterprises</span>
+</button>
+<div class="slds-truncate" title="Rohde Enterprises"><a href="javascript:void(0);" tabindex="-1">Rohde Enterprises</a></div>
+</th>
+<td data-label="Employees" role="gridcell">
+<div class="slds-truncate" title="6,000">6,000</div>
+</td>
+<td data-label="Phone Number" role="gridcell">
+<div class="slds-truncate" title="837-555-1212">837-555-1212</div>
+</td>
+<td data-label="Account Owner" role="gridcell">
+<div class="slds-truncate" title="John Doe"><a href="javascript:void(0);" tabindex="-1">John Doe</a></div>
+</td>
+<td data-label="Billing City" role="gridcell">
+<div class="slds-truncate" title="New York, NY">New York, NY</div>
+</td>
+<td class="slds-cell-shrink" role="gridcell">
+<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" tabindex="-1" title="More actions for Rohde Enterprises">
+    <lightning:icon size="x-small" iconName="utility:down"/>
+
+<span class="slds-assistive-text">More actions for Rohde Enterprises</span>
+</button>
+</td>
+</tr>
+<tr aria-level="1" aria-posinset="4" aria-setsize="4" class="slds-hint-parent">
+<th class="slds-tree__item" data-label="Account Name" scope="row">
+<button class="slds-button slds-button_icon slds-button_icon slds-button_icon-x-small slds-m-right_x-small slds-is-disabled" aria-hidden="true" tabindex="-1" title="Expand Cheese Corp">
+    <lightning:icon size="x-small" iconName="utility:chevronright"/>
+
+<span class="slds-assistive-text">Collapse Cheese Corp</span>
+</button>
+<div class="slds-truncate" title="Cheese Corp"><a href="javascript:void(0);" tabindex="-1">Cheese Corp</a></div>
+</th>
+<td data-label="Employees" role="gridcell">
+<div class="slds-truncate" title="1,234">1,234</div>
+</td>
+<td data-label="Phone Number" role="gridcell">
+<div class="slds-truncate" title="837-555-1212">837-555-1212</div>
+</td>
+<td data-label="Account Owner" role="gridcell">
+<div class="slds-truncate" title="Jane Doe"><a href="javascript:void(0);" tabindex="-1">Jane Doe</a></div>
+</td>
+<td data-label="Billing City" role="gridcell">
+<div class="slds-truncate" title="Paris, France">Paris, France</div>
+</td>
+<td class="slds-cell-shrink" role="gridcell">
+<button class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small" aria-haspopup="true" tabindex="-1" title="More actions for Cheese Corp">
+    <lightning:icon size="x-small" iconName="utility:down"/>
+
+<span class="slds-assistive-text">More actions for Cheese Corp</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</aura:component>

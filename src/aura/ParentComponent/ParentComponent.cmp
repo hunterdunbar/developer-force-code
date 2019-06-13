@@ -1,0 +1,8 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" >
+	<p>Hello World</p>
+    <aura:handler name="init" value="{!this}" action="{!c.callChildMethod}"/>
+    <c:ChildComponent aura:id="child"/>
+    <c:ChildComponent aura:id="child2"/>
+    <lightning:button label="Call aura:method in child component"
+        onclick="{! c.callChildMethod}" />
+</aura:component>

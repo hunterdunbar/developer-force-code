@@ -1,0 +1,13 @@
+/**
+ * Created by Ivan on 20.04.2018.
+ */
+
+trigger MAS_ContactTrigger on Contact (after insert) {
+
+    if(Trigger.isAfter) {
+        if(Trigger.isInsert) {
+            MAS_ContactHelper.afterInsert(Trigger.new);
+        }
+    }
+
+}

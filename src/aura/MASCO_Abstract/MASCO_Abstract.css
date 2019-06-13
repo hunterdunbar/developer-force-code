@@ -1,0 +1,6 @@
+.THIS select{
+    min-height: calc(2.125rem + 2px);
+}
+.THIS .mas-reader-field .slds-icon{
+    fill: #000;
+}

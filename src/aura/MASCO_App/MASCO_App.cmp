@@ -1,0 +1,25 @@
+<aura:component controller="MAS_UserUtils" description="Root component" implements="forceCommunity:availableForAllPageTypes" access="global">
+    <aura:handler event="aura:locationChange" action="{!c.locationChange}"/>
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+
+    <aura:attribute name="prefix" type="string" default="" description="Prefix in title"/>
+    <aura:attribute name="location" type="list" default="[
+            {'current': true,  'url': 'dashboard', 'title': 'Dashboard'},
+            {'current': false, 'url': 'plan-of-study', 'title': 'Plan of Study'},
+            {'current': false, 'url': 'summer-plans', 'title': 'Summer Plans'},
+            {'current': false, 'url': 'abstract', 'title': 'Abstract'},
+            {'current': false, 'url': 'crit-day', 'title': 'Crit Day'},
+            {'current': false, 'url': 'proposal', 'title': 'Proposal'},
+            {'current': false, 'url': 'thesis', 'title': 'Thesis'},
+            {'current': false, 'url': 'error', 'title': 'Error'},
+        ]" description="List of all Pages for routing"/>
+    <aura:attribute name="param" type="string" default="" description="Params for component (f.e. Id of object)"/>
+    <aura:attribute name="type" type="string" default="" description="Type of Page for Ordered and Returning Parts"/>
+    <aura:attribute name="back" type="string" default="" description="Back url for IB detail/audit"/>
+    <aura:attribute name="userRole" type="String" default="Student" description="User Role (Student/Advisor)"/>
+
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <lightning:spinner variant="brand" alternativeText="loading..." aura:id="spinner" class="app-spinner" size="large"/>
+        {!v.body}
+
+</aura:component>

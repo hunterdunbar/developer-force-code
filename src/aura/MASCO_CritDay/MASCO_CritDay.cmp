@@ -1,0 +1,31 @@
+<aura:component controller="MAS_CritDayAvailabilityController" implements="forceCommunity:availableForAllPageTypes" access="global">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!-- DETAIL VIEW PARAMETERS -->
+    <aura:attribute name="userRole" type="string" default="" description="User Role (Student/Advisor)"/>
+
+    <div class="slds-border_bottom">
+        <ul class="slds-grid slds-page-header__detail-row slds-m-around_none slds-p-horizontal_x-large">
+            <li class="slds-page-header__detail-block">
+                <p class="slds-text-title slds-truncate slds-m-bottom_xx-small">Crit Day Dates</p>
+                <p class="slds-text-body_regular slds-truncate">—</p>
+            </li>
+            <li class="slds-page-header__detail-block">
+                <p class="slds-text-title slds-truncate slds-m-bottom_xx-small">Comments Close</p>
+                <p class="slds-text-body_regular slds-truncate">—</p>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="slds-p-around_x-large">
+
+        <aura:if isTrue="{!or(v.userRole == 'Advisor', v.userRole == 'Reader')}">
+            <div class="slds-m-bottom_xx-large">
+	            <c:MASCO_CritDayAvailability />
+            </div>
+        </aura:if>
+
+        <div class="slds-text-heading_large">Crit Day Presentations</div>
+        <p class="slds-m-top_small">Click on Abstarct Title to leave a comment for the presentor.</p>
+    </div>
+</aura:component>

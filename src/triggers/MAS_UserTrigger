@@ -1,0 +1,10 @@
+/**
+ * Created by Ivan on 05.04.2018.
+ */
+trigger MAS_UserTrigger on User (after insert) {
+    if(Trigger.isAfter) {
+        if(Trigger.isInsert) {
+            MAS_UserHelper.afterInsert(Trigger.new);
+        }
+    }
+}

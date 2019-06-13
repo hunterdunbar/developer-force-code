@@ -1,0 +1,388 @@
+<aura:component controller="MAS_PlanOfStudyController" implements="forceCommunity:availableForAllPageTypes"
+                access="global" description="Component for Manage PlanOfStudy records"
+                extends="c:MASCO_SObjectListManager">
+
+    <!-- DETAIL VIEW PARAMETERS -->
+    <aura:attribute name="pos" type="MAS_Plan_of_Study__c" default="{ 'sobjectType': 'MAS_Plan_of_Study__c' }"
+                    description="Plan of Study object"/>
+    <aura:attribute name="posId" type="String" default=""
+                    description="Plan of Study Id"/>
+    <aura:attribute name="readonly" type="boolean" default="false" description="Readonly form parameter"/>
+    <aura:attribute name="advisor" type="String" default="" description="Advisor Name"/>
+    <aura:attribute name="student" type="String" default="" description="Student Name"/>
+
+
+    <!-- DATATABLE PARAMETERS -->
+    <aura:attribute name="wait" type="boolean" default="true" description="Flag for delayed loading"/>
+    <aura:attribute name="objectName" type="string" default="MAS_Plan_of_Study__c"
+                    description="Object name for SObjectListManager"/>
+    <aura:attribute name="filterCode" type="string" default="PlanOfStudy"
+                    description="Filter Code for SObjectListManager"/>
+    <aura:attribute name="pageSet" type="List" default="[{'pageNumber':1, 'pageSize':50}]"
+                    description="Page Set for SObjectListManager"/>
+
+    <aura:attribute name="fieldSet" type="List" default="[
+            {'name':'MAS_Student__r.Name', 'label':'Student Name', 'sortable':true,  'type': 'object', 'params':{'object':'MAS_Student__r', 'field':['Name']},},
+            {'name':'MAS_Name__c', 'label':'Plan of Study', 'sortable':false, 'type' : 'realLink', 'link': 'plan-of-study', 'staticName' : 'View Plan of Study', 'dataField': 'MAS_Student__c'},
+            {'name':'MAS_Status__c', 'label':'Status', 'sortable':true}
+        ]" description="Field Set for Summer Plans table"/>
+
+
+    <aura:attribute name="userRole" type="String" default=""
+                    description="User Role (Student/Advisor)"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+
+    <!-- DETAIL VIEW -->
+    <aura:if isTrue="{!v.posId!=''}">
+
+
+        <!-- TOP DETAIL PANEL BLOCK -->
+        <div class="slds-page-header slds-p-top--none">
+            <div class="slds-grid slds-page-header__detail-row bordered slds-p-left--x-large slds-m-top--none">
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Plan of Study Status">
+                        Plan of Study Status
+                    </p>
+                    <p class="slds-text-body--regular slds-truncate"
+                       title="{!v.pos.MAS_Status__c}">{!v.pos.MAS_Status__c}</p>
+                </div>
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Student Name">Student
+                        Name</p>
+                    <p class="slds-text-body--regular"
+                       title="{!v.student}">{!v.student}</p>
+                </div>
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Advisor Name">Advisor
+                        Name</p>
+                    <p class="slds-text-body--regular"
+                       title="{!v.advisor}">{!v.advisor}</p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- CONTENT BLOCK -->
+        <div class="mas-body-layout">
+
+
+            <!-- FORM TITLE -->
+            <aura:if isTrue="{!v.userRole=='Advisor'}">
+                <span class="slds-text-heading_large">Review Plan of Study</span>
+                <p class="slds-text-title">
+                    It is assumed that in each semester the required course MAS 910 -
+                    Research in Media Technology is included in the Plan of Study.
+                </p>
+            </aura:if>
+            <aura:if isTrue="{!v.userRole=='Student'}">
+                <span class="slds-text-heading_large">Submit Your Plan of Study</span>
+                <p class="slds-text-title">
+                    It is assumed that in each semester the required course MAS 910 -
+                    Research in Media Technology is included in the Plan of Study.<br/>
+                    Please fill in the rest of your planned courses.
+                </p>
+            </aura:if>
+
+
+            <div class="slds-grid slds-m-top--medium">
+                <div class="slds-size--2-of-3 slds-form slds-form_compound plan-of-study-form">
+
+                    <div class="slds-size--1-of-1 slds-m-top--medium">
+
+                        <!-- FORM TOP LEFT BLOCK -->
+                        <span class="slds-text-heading--medium">Fall Semester 1</span>
+                        <div class="slds-form-element__row slds-m-top--medium">
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_1_1_Title__c">Course 1 Title (Fall
+                                    Semester 1)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_1_1_Title__c"
+                                                  value="{!v.pos.MAS_1_1_Title__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_1_1_Subject__c">Course 1 Subject (Fall
+                                    Semester 1)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_1_1_Subject__c"
+                                                  value="{!v.pos.MAS_1_1_Subject__c}" class="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_1_2_Title__c">Course 2 Title (Fall
+                                    Semester 1)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_1_2_Title__c"
+                                                  value="{!v.pos.MAS_1_2_Title__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_1_2_Subject__c">Course 2 Subject (Fall
+                                    Semester 1)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_1_2_Subject__c"
+                                                  value="{!v.pos.MAS_1_2_Subject__c}" class="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_1_Alt_Title__c">Alt Course Title (Fall
+                                    Semester 1)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_1_Alt_Title__c"
+                                                  value="{!v.pos.MAS_1_Alt_Title__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_1_Alt_Subject__c">Alt Course Subject
+                                    (Fall
+                                    Semester 1)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_1_Alt_Subject__c"
+                                                  value="{!v.pos.MAS_1_Alt_Subject__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- FORM TOP RIGHT BLOCK -->
+                    <div class="slds-size--1-of-1 slds-m-top--large">
+                        <span class="slds-text-heading--medium">Spring Semester 2</span>
+                        <div class="slds-form-element__row slds-m-top--medium">
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_2_1_Title__c">Course 1 Title (Spring
+                                    Semester 2)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_2_1_Title__c"
+                                                  value="{!v.pos.MAS_2_1_Title__c}" class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_2_1_Subject__c">Course 1 Subject
+                                    (Spring
+                                    Semester 2)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_2_1_Subject__c"
+                                                  value="{!v.pos.MAS_2_1_Subject__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_2_2_Title__c">Course 2 Title (Spring
+                                    Semester 2)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_2_2_Title__c"
+                                                  value="{!v.pos.MAS_2_2_Title__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_2_2_Subject__c">Course 2 Subject
+                                    (Spring
+                                    Semester 2)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_2_2_Subject__c"
+                                                  value="{!v.pos.MAS_2_2_Subject__c}" class="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_2_Alt_Title__c">Alt Course Title
+                                    (Spring
+                                    Semester 2)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_2_Alt_Title__c"
+                                                  value="{!v.pos.MAS_2_Alt_Title__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_2_Alt_Subject__c">Alt Course Subject
+                                    (Spring
+                                    Semester 2)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_2_Alt_Subject__c"
+                                                  value="{!v.pos.MAS_2_Alt_Subject__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slds-size--1-of-1 slds-m-top--large">
+
+
+                        <!-- FORM BOTTOM LEFT BLOCK -->
+                        <span class="slds-text-heading--medium">Fall Semester 3</span>
+                        <div class="slds-form-element__row slds-m-top--medium">
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_3_1_Title__c">Course 1 Title (Fall
+                                    Semester 3)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_3_1_Title__c"
+                                                  value="{!v.pos.MAS_3_1_Title__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_3_1_Subject__c">Course 1 Subject (Fall
+                                    Semester 3)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_3_1_Subject__c"
+                                                  value="{!v.pos.MAS_3_1_Subject__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_3_2_Title__c">Course 2 Title (Fall
+                                    Semester 3)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_3_2_Title__c"
+                                                  value="{!v.pos.MAS_3_2_Title__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_3_2_Subject__c">Course 2 Subject (Fall
+                                    Semester 3)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_3_2_Subject__c"
+                                                  value="{!v.pos.MAS_3_2_Subject__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_3_Alt_Title__c">Alt Course Title (Fall
+                                    Semester 3)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_3_Alt_Title__c"
+                                                  value="{!v.pos.MAS_3_Alt_Title__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-2">
+                                <label class="slds-form-element__label" for="MAS_3_Alt_Subject__c">Alt Course Title
+                                    Subject (Fall
+                                    Semester 3)</label>
+                                <div class="slds-form-element__control">
+                                    <ui:inputText change="{!c.inputChange}" disabled="{!v.readonly}"
+                                                  aura:id="MAS_3_Alt_Subject__c"
+                                                  value="{!v.pos.MAS_3_Alt_Subject__c}"
+                                                  class="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- ADVISOR ACTION BUTTONS -->
+                        <aura:if isTrue="{!v.userRole=='Advisor'}">
+                            <a class="slds-button slds-button_neutral slds-m-top_large slds-m-right_medium"
+                               href="#plan-of-study">
+                                Back to List
+                            </a>
+                            <aura:if isTrue="{!v.pos.MAS_Status__c == 'Student Submitted'}">
+                                <button class="slds-button slds-button_brand slds-m-top_large slds-m-right_medium"
+                                        onclick="{!c.approvePOS}">
+                                    Approve
+                                </button>
+                            </aura:if>
+                        </aura:if>
+
+
+                        <!-- STUDENT ACTION BUTTONS -->
+                        <aura:if isTrue="{!and(v.userRole=='Student', v.pos.MAS_Status__c == 'Unreviewed')}">
+                            <button class="slds-button slds-button_neutral slds-m-top_large slds-m-right_medium"
+                                    onclick="{!c.savePOS}">
+                                Save
+                            </button>
+                            <button class="slds-button slds-button_brand slds-m-top_large slds-m-right_medium"
+                                    onclick="{!c.submitPOS}">
+                                Submit
+                            </button>
+                        </aura:if>
+                    </div>
+                </div>
+
+                <div class="slds-size--1-of-3">
+
+                    <!-- FORCE CHATTER BLOCK -->
+                    <div class="slds-m-top--large  slds-p-left--large ">
+                        <aura:if isTrue="{!v.pos.Id}">
+                            <span class="slds-text-heading--medium">Feed</span>
+                            <div class="slds-m-top--large">
+                                <aura:if isTrue="{!v.userRole=='Advisor'}">
+                                    <forceChatter:publisher context="RECORD" recordId="{!v.pos.Id}"/>
+                                </aura:if>
+                                <forceChatter:feed type="Record" subjectId="{!v.pos.Id}"/>
+                            </div>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+
+
+    <!-- ADVISOR DATATABLE BLOCK -->
+    <aura:if isTrue="{!and(v.userRole=='Advisor', v.posId=='')}">
+
+        <div class="mas-body-layout">
+            <span class="slds-text-heading_large">MY STUDENTS</span>
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-m-top--large">
+                <thead>
+                <tr class="slds-text-title--caps">
+                    <c:MASCO_SortingComponent fieldSet="{!v.fieldSet}"/>
+                </tr>
+                </thead>
+
+                <c:MASCO_TableRender objectSet="{!v.objects}"
+                                     fieldSet="{!v.fieldSet}" pageSet="{!v.pageSet}"/>
+            </table>
+        </div>
+        <div class="slds-m-around--medium">
+            <c:MASCO_PaginationComponent page="{!v.pageSet[0].pageNumber}" pageSize="{!v.pageSet[0].pageSize}"
+                                         totalCount="{!v.totalCount}"/>
+        </div>
+    </aura:if>
+</aura:component>

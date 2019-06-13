@@ -1,0 +1,6 @@
+<aura:component implements="force:appHostable">
+
+    <c:SearchBar />
+    <c:CampaignList />
+
+</aura:component>

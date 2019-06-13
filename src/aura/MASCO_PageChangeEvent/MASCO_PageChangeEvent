@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Event for page change">
+    <aura:attribute name="id" type="string" default="" description="Id of Component"/>
+    <aura:attribute name="page" type="integer" default="1" description="Page Number"/>
+    <aura:attribute name="pageSize" type="integer" default="8" description="Count of Items per Page"/>
+</aura:event>

@@ -1,0 +1,12 @@
+<aura:component implements="forceCommunity:themeLayout" access="global" description="Sample Custom Theme Layout">
+    <aura:attribute name="newHeader" type="Aura.Component[]" required="false"/>
+    <ltng:require styles="{!$Resource.SLDS252+'/styles/salesforce-lightning-design-system.min.css'}"/>
+    <ltng:require styles="{!$Resource.MASResources+'/styles/slds-addons.css'}"/>
+    <ltng:require styles="{!$Resource.MASResources+'/styles/main.css'}"/>
+    <div>
+        <div class="mainContentArea">
+            <div class="new-header">{!v.newHeader}</div>
+                {!v.body}
+        </div>
+    </div>
+</aura:component>

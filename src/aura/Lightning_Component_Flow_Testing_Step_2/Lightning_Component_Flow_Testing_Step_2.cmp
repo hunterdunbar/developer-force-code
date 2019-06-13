@@ -1,0 +1,8 @@
+<aura:component implements="lightning:availableForFlowScreens" access="global">
+    <aura:attribute name="screen2Greeting" type="String" default="Hello" access="global" />
+    <aura:attribute name="screen2subject" type="String" default="World" access="global" />
+
+    <div style="box">
+      <span class="greeting">{!v.screen2Greeting}</span>, {!v.screen2subject}!
+    </div>
+</aura:component>

@@ -1,0 +1,43 @@
+<aura:component description="Component for render table headers">
+    <aura:attribute name="fieldSet" type="List" description="List of fields"/>
+    <aura:attribute name="sortingField" type="string" description="Current field with sorting"/>
+    <aura:attribute name="asc" type="boolean" description="Sorting direction"/>
+    <aura:iteration items="{!v.fieldSet}" var="field">
+
+        <!-- FIELD SORTABLE -->
+        <aura:if isTrue="{!field.sortable}">
+            <th focusable="true" data-href="{!field.name}"
+                class="{!field.class + 'slds-is-sortable slds-text-title--caps ' +
+                        (v.sortingField==field.name ?('slds-is-sorted ' + (v.asc?'slds-is-sorted--asc':'slds-is-sorted--desc')):' ') +
+                        ' table-column-type--' + (field.type || 'default')}"
+                scope="col" style="{!field.styles}">
+                <a href="javascript:void(0);" onclick="{!c.sortBy}" class="slds-th__action slds-text-link--reset"
+                   tabindex="0">
+                    <span class="slds-assistive-text">Sort </span>
+                    <span class="slds-truncate" title="{!field.label}">
+                            <aura:if isTrue="{!field.required}">
+                                <abbr class="slds-required" title="required">*</abbr>
+                            </aura:if>
+                            {!field.label}</span>
+                    <c:MASCO_SvgIcon svgPath="{!$Resource.SLDS252 + '/icons/utility-sprite/svg/symbols.svg#arrowdown'}"
+                                      class="slds-is-sortable__icon arrow-down" category="utility" size="small"
+                                      name="arrowdown"/>
+                </a>
+            </th>
+
+
+            <!-- FIELD NOT SORTABLE -->
+            <aura:set attribute="else">
+                <th scope="col" style="{!field.styles}" class="{!field.class + ' slds-th--no-action' +
+                        ' table-column-type--' + (field.type || 'default')+
+                        (field.type=='buttonList' ? ' button-list--size-'+field.values.length:'')}">
+                    <div class="{!(field.type=='buttonList' ? '':' slds-truncate')}" title="{!field.label}">
+                        <aura:if isTrue="{!field.required}">
+                            <abbr class="slds-required" title="required">*</abbr>
+                        </aura:if>{!field.label}</div>
+                </th>
+            </aura:set>
+
+        </aura:if>
+    </aura:iteration>
+</aura:component>

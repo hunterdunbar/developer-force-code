@@ -1,0 +1,102 @@
+<apex:page >
+  <script>
+  window.onload = function(){
+
+        var lat = document.getElementById("lat");
+        var lon = document.getElementById("lon");
+        var address = document.getElementById("address");
+        var street = document.getElementById("strt1");
+        var street2 = document.getElementById("strt2");
+        var city = document.getElementById("city");
+        var state = document.getElementById("state");
+        var zip = document.getElementById("zip");
+        var addimage = document.getElementById("theimage");
+        console.log(addimage);
+        
+        
+        address.addEventListener("change", getGeo);
+
+        function getGeo(e){
+
+            // make an send an XmlHttpRequest
+            
+            var x = new XMLHttpRequest();
+            x.open("GET","https://maps.googleapis.com/maps/api/geocode/json?address="+this.value,true);
+            x.send();
+
+            // set up a listener for the response
+            x.onreadystatechange=function(){
+                if (this.readyState==4 && this.status==200){
+                    console.log(this.response);
+                    var l = JSON.parse(this.response).results[0].geometry.location;
+                    var a = JSON.parse(this.response).results[0].address_components;
+                    console.log(a[0].types+a[3].types+a[3].types[0]+a[3].types[1]);
+                    
+                    if (l.lat) {
+                        lat.value = l.lat;
+                    }
+                    if (l.lng) {
+                        lon.value = l.lng;
+                    }
+                    if(l.lat && l.lng)
+                    var add = "https://maps.googleapis.com/maps/api/staticmap?center="
+                    add += "&zoom=17&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C"+l.lat+","+l.lng;
+                    addimage.setAttribute("src",add);
+                    for(var i=0;i<a.length;i++){
+                    if (a[i].types[0] == "street_number"){
+                        street.value = a[i].long_name;
+                    }
+                    if (a[i].types[0] == "route"){
+                        street.value += ' ' +a[i].long_name;
+                    }
+                    if (a[i].types[0] == "subpremise"){
+                        street2.value += a[i].long_name;
+                    }
+                    if (a[i].types[0] == "locality"){
+                        city.value = ' ' +a[i].long_name;
+                    }
+                    if (a[i].types[0] == "administrative_area_level_1"){
+                        state.value = ' ' +a[i].short_name;
+                    }
+                    if (a[i].types[0] == "postal_code"){
+                        zip.value = ' ' +a[i].long_name;
+                    }
+                    }
+
+                }
+            }
+
+
+        }
+
+    }
+    </script>
+    <body>
+
+       <apex:form id="theForm">
+        <h4>Lookup happens </h4>
+        Enter a Zip or Postal Code (worldwide)<br></br>
+        
+        <input placeholder="Address" name="address" id="address" type="text" style="height:40px;width:500px"></input><br></br>
+
+        Lat: <input size="20" placeholder="Lat" name="lat" id="lat" type="text"></input><br></br>
+        Lon: <input size="20" placeholder="Lon" name="lon" id="lon" type="text"></input><br></br>
+        Street: <input size="20" placeholder="Street" name="strt1" id="strt1" type="text"></input><br></br>
+        Street2: <input size="20" placeholder="Street" name="strt2" id="strt2" type="text"></input><br></br>
+        City: <input size="20" placeholder="City" name="city" id="city" type="text"></input><br></br>
+        State: <input size="20" placeholder="State" name="state" id="state" type="text"></input><br></br>
+        Zip: <input size="20" placeholder="Zip" name="zip" id="zip" type="text"></input><br></br>
+        
+        
+        <div id="output"></div>
+
+       </apex:form>
+       <br></br>
+       <div>
+       <img id="theimage"/>
+       </div>
+       
+    </body>
+    
+    
+</apex:page>

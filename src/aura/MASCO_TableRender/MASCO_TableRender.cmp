@@ -1,0 +1,17 @@
+<aura:component description="Component for render table">
+    <aura:attribute name="tableId" type="string" default="" description="Id of table"/>
+    <aura:attribute name="objectSet" type="List" description="List of objects"/>
+    <aura:attribute name="fieldSet" type="List" description="List of fields"/>
+    <aura:attribute name="pageSet" type="List" description="Pagination parameters"/>
+    <aura:attribute name="allow" type="boolean" default="false" description="Flag for Component Render Completed"/>
+
+    <aura:registerEvent name="actionEvent" type="c:MASCO_ActionEvent"/>
+    <aura:handler name="change" value="{!v.allow}" action="{!c.renderTable}"/>
+    <aura:handler name="change" value="{!v.objectSet}" action="{!c.renderTable}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+
+    <tbody id="{!v.tableId}">
+
+    </tbody>
+</aura:component>

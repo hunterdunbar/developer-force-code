@@ -1,0 +1,6 @@
+.THIS.slds-progress{
+    max-width:100%;
+}
+.THIS.slds-progress .slds-progress-bar{
+    height:3px;
+}

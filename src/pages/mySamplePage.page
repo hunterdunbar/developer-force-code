@@ -1,0 +1,20 @@
+<apex:page >
+  <apex:includeLightning />
+  <p>Hi World</p>
+  <div id="lightning"/>
+
+    <script>
+        $Lightning.use("c:Wave_Out_App", function(){
+            $Lightning.createComponent("ui:button",
+
+          { label : "Press Me!" },
+
+          "lightning",
+
+          function(cmp) {
+
+            // do some stuff
+          });
+        });
+    </script>
+</apex:page>

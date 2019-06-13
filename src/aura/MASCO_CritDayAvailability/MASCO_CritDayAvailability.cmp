@@ -1,0 +1,114 @@
+<aura:component controller="MAS_CritDayAvailabilityController" implements="forceCommunity:availableForAllPageTypes" access="global">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <aura:attribute name="isSubmitted" type="boolean" default="false" access="private" />
+    <aura:attribute name="submitBy" type="date" access="private" />
+
+    <aura:attribute name="availabilityData" type="list" default="[]" access="private" />
+    <aura:attribute name="availableRemotely" type="boolean" default="false" access="private" />
+    <aura:attribute name="skype" type="string" default="" access="private" />
+
+
+
+
+    <div class="mas-critday_availability">
+        <div class="slds-text-heading_large">Submit Crit Day Availability</div>
+        <p class="slds-m-top_small">Please click the button below to submit our availability to attend Crit Day presentations.</p>
+    
+        <div class="slds-m-top_medium">
+            <aura:if isTrue="{!v.isSubmitted}">
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_success slds-container_small" role="alert">
+                    <lightning:icon iconName="utility:success" size="x-small" class="slds-m-right_x-small" variant="inverse" />
+                    You have submitted Crit Day Availability. Thank you.
+                </div>
+    
+                <aura:set attribute="else">
+                    <div class="slds-grid">
+                        <div class="slds-m-right_xx-large">
+                            <div class="slds-text-title">Submit By</div>
+                            <b><lightning:formattedDateTime value="{!v.submitBy}" /></b>
+                        </div>
+    
+                        <lightning:button label="Select Availability" variant="brand" onclick="{!c.openModal}" />
+                    </div>
+                </aura:set>
+            </aura:if>
+        </div>
+    
+    
+        <div aura:id="modal" class="slds-modal slds-modal-backdrop slds-modal_medium">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeModal}">
+                        <lightning:icon iconName="utility:close" variant="inverse" size="small" class="slds-button__icon slds-button__icon_large" />
+                    </button>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Select Availability</h2>
+                </header>
+        
+                <div class="slds-modal__content">
+                    <aura:if isTrue="{!v.availabilityData.length > 0}">
+	                    <div class="slds-p-around_medium">
+                            <p class="slds-text-align_center slds-m-bottom_medium">Please choose as many times as possible that you can be available for Crit Day by clicking on the blocks for each day</p>
+    
+                            <div class="slds-grid slds-grid_align-center">
+    
+                                <aura:iteration items="{!v.availabilityData}" var="col" indexVar="colI">
+                                    <div class="slds-size_5-of-12 slds-p-horizontal_medium">
+                                    <table class="mas-critday_availability-table">
+                                        <tr>
+                                            <td>&nbsp;</td>
+                                            <th class="mas-critday_availability-day">
+                                                <!--span>Day {!(colI+1)}: </span-->
+                                                <lightning:formattedDateTime value="{!col.day}" />
+                                            </th>
+                                        </tr>
+                        
+                                        <aura:iteration items="{!col.items}" var="item">
+                                            <tr>
+                                                <td class="mas-critday_availability-time">
+                                                    <ui:outputDateTime value="{!item.MAS_Start_Time__c}" format="h:mm a" />
+                                                </td>
+                                                <td>
+                                                    <aura:if isTrue="{!not(item.MAS_Is_Break__c)}">
+                                                        <c:MASCO_CritDayAvailabilityToggle value="{!item.MAS_IsAvailable__c}" />
+                                                
+                                                        <aura:set attribute="else">
+                                                            <div class="slds-theme_alert-texture slds-theme_warning mas-critday_availability-toggle">Break</div>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </td>
+                                            </tr>
+                                        </aura:iteration>
+                                    </table>
+                                    </div>
+                                </aura:iteration>
+    
+                            </div>
+	                    </div>
+
+
+	                    <div class="slds-p-horizontal_x-large slds-p-vertical_medium slds-border_top">
+                            <p>If you are unable to attend in person and are available remotely, please fill in the following two fields so that MIT staff can conference you in to the presentation:</p>
+                            <div class="slds-grid slds-grid_vertical-align-center slds-m-top_medium">
+    	                        <lightning:input type="checkbox" name="availableRemotely" checked="{!v.availableRemotely}" label="Available Remotely?" />
+	                            <lightning:input type="text" name="skype" value="{!v.skype}" label="" placeholder="Skype Username" variant="label-hidden" class="slds-m-left_large mas-critday_availability-skype" disabled="{!not(v.availableRemotely)}" />
+                            </div>
+	                    </div>
+
+                            
+                        <aura:set attribute="else">
+                            <div class="slds-is-relative slds-p-around_xx-large">
+                                <lightning:spinner variant="brand" size="large"/>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </div>
+        
+                <footer class="slds-modal__footer">
+                    <lightning:button label="Cancel" onclick="{!c.closeModal}" />
+                    <lightning:button variant="brand" label="Submit" onclick="{!c.submit}" disabled="{!or(not(v.availabilityData.length > 0), and(v.availableRemotely, v.skype == ''))}" />
+                </footer>
+            </div>
+        </div>
+    </div>
+</aura:component>

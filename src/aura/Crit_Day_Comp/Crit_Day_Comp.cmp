@@ -1,0 +1,20 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="critDayAvailabilityController">
+<aura:attribute name="myObject" type="Crit_Day_Availability__c[]"/>
+    <aura:attribute name="items" type="Object"/>
+<aura:attribute name="gridColumns" type="List"/>
+    <aura:attribute name="gridData" type="Object"/>
+    <aura:attribute name="gridExpandedRows" type="Object" />
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+  
+    <aura:iteration items="{!v.myObject}" var="obj">
+    
+    {!obj.Name} {!obj.Unavailable__c}
+  </aura:iteration>
+    <lightning:tree items="{!v.items}" header="Roles"/>
+	<lightning:datatable columns="{!v.gridColumns}"
+        data="{!v.gridData}"   
+        keyField="name"
+        
+    />
+    <p>Hello</p>
+</aura:component>

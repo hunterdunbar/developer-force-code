@@ -1,0 +1,349 @@
+<aura:component controller="MAS_ProposalController" implements="forceCommunity:availableForAllPageTypes"
+                access="global" description="Component for Manage Proposal records"
+                extends="c:MASCO_SObjectListManager">
+
+    <!-- DETAIL VIEW PARAMETERS -->
+    <aura:attribute name="proposal" type="MAS_Proposal__c"
+                    default="{ 'sobjectType': 'MAS_Proposal__c' }"
+                    description="Proposal object for detail view"/>
+    <aura:attribute name="proposalId" type="String" default=""
+                    description="Id of Proposal in detail view"/>
+    <aura:attribute name="userRole" type="String" default=""
+                    description="User Role (Student/Advisor)"/>
+    <aura:attribute name="readOnly" type="String" default="true"
+                    description="Readonly fields (for Advisor)"/>
+
+    <!-- DETAIL VIEW PARAMETERS FOR STUDENT -->
+    <aura:attribute name="proposalTab" type="String" default="1"
+                    description="Selected tab parameter"/>
+    <aura:attribute name="fieldSetAttachmentStudent" type="List" default="[]" description="Field Set for Attachments"/>
+
+    <!-- DETAIL VIEW PARAMETERS FOR ADVISOR -->
+    <aura:handler name="change" value="{!v.objects}" action="{!c.setIcons}"/>
+
+
+    <!-- DATATABLE PARAMETERS -->
+    <aura:attribute name="wait" type="boolean" default="true" description="Flag for delayed loading"/>
+    <aura:attribute name="objectName" type="string" default="MAS_Proposal__c"
+                    description="Object name for SObjectListManager"/>
+    <aura:attribute name="filterCode" type="string" default="ProposalList"
+                    description="Filter Code for SObjectListManager"/>
+    <aura:attribute name="pageSet" type="List" default="[{'pageNumber':1, 'pageSize':50}]"
+                    description="Page Set for SObjectListManager"/>
+
+    <aura:attribute name="fieldSet" type="List" default="[
+            {'name':'MAS_Student__r.Name', 'label':'Student Name', 'sortable':true,  'type': 'object', 'params':{'object':'MAS_Student__r', 'field':['Name']},},
+            {'name':'MAS_Abstract__c',
+            'label':'Proposal',
+            'sortable':false,
+            'type' : 'realLink',
+            'link': 'proposal',
+            'staticName' : 'View Proposal',
+            'dataField': 'MAS_Student__c',
+            'customParams' : [{'name' : 'type', 'value' : '1'}]
+            },
+        ]" description="Field Set for Proposal table"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+
+    <!-- TABLE VIEW FOR ADVISOR -->
+    <aura:if isTrue="{!and(v.userRole=='Advisor', v.proposalId=='')}">
+
+        <!-- ADVISOR TABLE DETAIL PANEL -->
+        <div class="slds-page-header slds-p-top--none">
+            <div class="slds-grid slds-page-header__detail-row bordered slds-p-left--x-large slds-m-top--none">
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Serial #">Plan of Study
+                        Status</p>
+                    <p class="slds-text-body--regular slds-truncate"
+                       title="">Not Started</p>
+                </div>
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Item #">Student Advisor</p>
+                    <p class="slds-text-body--regular"
+                       title="">John Anderson</p>
+                </div>
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Item Desc.">Field 3</p>
+                    <p class="slds-text-body--regular"
+                       title="">Hyperlink e.g.</p>
+                </div>
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Item Instance">Field 4</p>
+                    <p>
+                        <span title="">Listing Only</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- DATATABLE -->
+        <div class="mas-body-layout">
+            <span class="slds-text-heading_large">MY STUDENTS</span>
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-m-top--large">
+                <thead>
+                <tr class="slds-text-title--caps">
+                    <c:MASCO_SortingComponent fieldSet="{!v.fieldSet}"/>
+                </tr>
+                </thead>
+                <c:MASCO_TableRender tableId="proposalList" objectSet="{!v.objects}"
+                                     fieldSet="{!v.fieldSet}" pageSet="{!v.pageSet}"/>
+            </table>
+            <div class="slds-m-around--medium">
+                <c:MASCO_PaginationComponent id="proposalListPagination" page="{!v.pageSet[0].pageNumber}"
+                                             pageSize="{!v.pageSet[0].pageSize}"
+                                             totalCount="{!v.totalCount}"/>
+            </div>
+        </div>
+    </aura:if>
+
+
+    <!-- DETAIL VIEW FOR BOTH PROFILES -->
+    <aura:if isTrue="{!v.proposalId!=''}">
+
+        <!-- PROPOSAL DETAIL VIEW -->
+        <div class="slds-page-header slds-p-top--none">
+            <div class="slds-grid slds-page-header__detail-row bordered slds-p-left--x-large slds-m-top--none">
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Proposal Status">
+                        Proposal Status
+                    </p>
+                    <p class="slds-text-body--regular slds-truncate"
+                       title="">
+                        Unreviewed
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+    </aura:if>
+
+
+    <!-- DETAIL VIEW FOR STUDENT-->
+    <aura:if isTrue="{!and(v.userRole == 'Student', v.proposalId!='')}">
+
+        <!-- TABS BLOCK -->
+        <div class="slds-tabs_default">
+            <ul class="slds-tabs_default__nav slds-p-left--x-large" role="tablist">
+                <li class="{!'slds-tabs_default__item' + (v.proposalTab == '1' ?  ' slds-is-active' : '')}"
+                    title="Upload" role="presentation"><a
+                        class="slds-tabs_default__link"
+                        href="{!'#proposal?type=1'}"
+                        role="tab" tabindex="0"
+                        aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Upload</a></li>
+                <li class="{!'slds-tabs_default__item' + (v.proposalTab == '2' ?  ' slds-is-active' : '')}"
+                    title="Reviews and Comments" role="presentation"><a
+                        class="slds-tabs_default__link"
+                        href="{!'#proposal?type=2'}"
+                        role="tab" tabindex="-1"
+                        aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">Reviews and
+                    Comments</a></li>
+            </ul>
+        </div>
+
+
+        <!-- CONTENT BLOCK -->
+        <div class="mas-body-layout">
+
+            <!-- FIRST TAB -->
+            <aura:if isTrue="{!v.proposalTab == '1'}">
+                <span class="slds-text-heading_large">Submit Proposal</span>
+                <div class="slds-form slds-form_compound plan-of-study-form slds-m-top--medium slds-size--2-of-3">
+
+                    <fieldset class="slds-form-element">
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label" for="MAS_Abstract__c">Abstract Title</label>
+                            <div class="slds-form-element__control">
+                                <ui:inputText change="" disabled="{!v.readOnly}"
+                                              aura:id="MAS_Abstract__c"
+                                              value="{!v.proposal.MAS_Abstract__c}"
+                                              class="slds-input"/>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- UPLOADING CONTROL -->
+                    <fieldset class="slds-form-element slds-m-top--large">
+                        <span class="slds-text-heading_medium">Choose your Proposal file to Upload for review</span>
+                        <c:MASCO_Attachment parentId="{!v.proposal.Id}"/>
+                    </fieldset>
+
+                    <button class="slds-button slds-button_neutral slds-m-top_large slds-m-right_medium"
+                            onclick="{!c.saveProposal}">
+                        Save
+                    </button>
+                    <button class="slds-button slds-button_brand slds-m-top_large slds-m-right_medium"
+                            onclick="{!c.submitProposal}">
+                        Submit
+                    </button>
+                </div>
+            </aura:if>
+
+
+            <!-- SECOND TAB -->
+            <aura:if isTrue="{!v.proposalTab == '2'}">
+                <div class="slds-grid">
+
+
+                    <!-- FORM -->
+                    <div class="slds-size--2-of-3">
+
+                        <!-- ATTACHMENTS TABLE -->
+                        <span class="slds-text-heading_large">Proposal File History</span>
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-m-top--large">
+                            <thead>
+                            <tr class="slds-text-title--caps">
+                                <c:MASCO_SortingComponent fieldSet="{!v.fieldSetAttachmentStudent}"/>
+                            </tr>
+                            </thead>
+                            <c:MASCO_TableRender tableId="proposalAttachmentsList" objectSet="{!v.objects}"
+                                                 fieldSet="{!v.fieldSetAttachmentStudent}" pageSet="{!v.pageSet}"/>
+                        </table>
+
+
+                        <!-- UPLOADING CONTROL -->
+                        <c:MASCO_Attachment actionEvent="{!c.actionEvent}" parentId="{!v.proposal.Id}"/>
+
+
+                        <!-- ADVISOR/READER STUSES TABLE -->
+                        <div class="slds-p-top--large">
+                            <span class="slds-text-heading_large">Reader and Advisor Review Status</span>
+                            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-m-top--large">
+                                <thead>
+                                <tr class="slds-text-title--caps">
+                                    <td>NAME</td>
+                                    <td>ROLE</td>
+                                    <td>STATUS</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>{!v.proposal.MAS_Reader_One__r.Name}</td>
+                                    <td>Advisor</td>
+                                    <td>{!v.proposal.MAS_Advisor_Status__c}</td>
+                                </tr>
+                                <tr>
+                                    <td>{!v.proposal.MAS_Reader_Two__r.Name}</td>
+                                    <td>Reader</td>
+                                    <td>{!v.proposal.MAS_Reader_One_Status__c}</td>
+                                </tr>
+                                <tr>
+                                    <td>{!v.proposal.MAS_Reader_Three__r.Name}</td>
+                                    <td>Reader</td>
+                                    <td>{!v.proposal.MAS_Reader_Two_Status__c}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button class="slds-button slds-button_brand slds-m-top_large slds-m-right_medium"
+                                onclick="{!c.submitProposal}">
+                            Submit
+                        </button>
+                    </div>
+
+
+                    <!-- CHATTER FEED -->
+                    <div class="slds-size--1-of-3 slds-p-left--large">
+                        <aura:if isTrue="{!v.proposal.Id}">
+                            <span class="slds-text-heading_large">Feed</span>
+                            <div class="slds-m-top--large slds-p-top--small">
+                                <forceChatter:feed type="Record" subjectId="{!v.proposal.Id}"/>
+                            </div>
+
+                        </aura:if>
+                    </div>
+                </div>
+            </aura:if>
+        </div>
+    </aura:if>
+
+
+    <!-- DETAIL VIEW FOR ADVISOR-->
+    <aura:if isTrue="{!and(v.userRole=='Advisor', v.proposalId!='')}">
+        <div class="mas-body-layout">
+            <div class="slds-grid slds-m-top--large">
+
+                <!-- FORM -->
+                <div class="slds-size--2-of-3">
+                    <span class="slds-text-heading_large">Proposal</span>
+                    <div class="slds-grid slds-p-bottom--large">
+
+
+                        <!-- FILE LIST -->
+                        <div class="slds-size--1-of-2">
+                            <span class="slds-text-heading_title">All Files</span>
+                            <aura:iteration items="{!v.objects}" var="attachment">
+                                <div class="slds-media slds-m-top--large">
+                                    <div class="slds-media__figure">
+                                        <a href="{!attachment.downloadLink}"
+                                           target="_blank">
+                                            <c:MASCO_SvgIcon svgPath="{!$Resource.SLDS252 + '/icons/doctype-sprite/svg/symbols.svg#' + attachment.icon}"
+                                                    category="doctype" size="large"
+                                                    name="{!attachment.icon}"></c:MASCO_SvgIcon>
+                                        </a>
+                                    </div>
+                                    <div class="slds-media__body">
+
+                                        <p class="slds-text-heading_title"><a href="{!attachment.downloadLink}"
+                                                                              target="_blank">{!attachment.ContentDocument.Title}</a></p>
+                                        <p class="slds-text-heading_title">{!attachment.ContentDocument.ContentModifiedDate}</p>
+                                    </div>
+                                </div>
+                            </aura:iteration>
+                        </div>
+
+
+                        <!-- DROPDOWN -->
+                        <div class="slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <div class="slds-select_container">
+                                        <select disabled="{!v.readOnly}"
+                                                class="slds-select"
+                                                id="MAS_2nd_Choice_Area_of_Concentration__c">
+                                            <option value="">Select an Option</option>
+                                            <option value="Approve as Is"
+                                                    selected="">
+                                                Approve as Is
+                                            </option>
+                                            <option value="Approve with Comments"
+                                                    selected="">
+                                                Approve with Comments
+                                            </option>
+                                            <option value="Comments Provided, Needs Resubmission"
+                                                    selected="">
+                                                Comments Provided, Needs Resubmission
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="slds-button slds-button_brand slds-m-top_large slds-m-right_medium"
+                            onclick="{!c.approveProposal}">
+                        Submit
+                    </button>
+                </div>
+
+
+                <!-- CHATTER FEED -->
+                <div class="slds-size--1-of-3 slds-p-left--large">
+                    <aura:if isTrue="{!v.proposal.Id}">
+                        <span class="slds-text-heading_large">Feed</span>
+                        <div class="slds-m-top--large slds-p-top--small">
+                            <forceChatter:publisher context="RECORD" recordId="{!v.proposal.Id}"/>
+                            <forceChatter:feed type="Record" subjectId="{!v.proposal.Id}"/>
+                        </div>
+
+                    </aura:if>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

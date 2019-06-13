@@ -1,0 +1,21 @@
+<aura:component extensible="true" abstract="true" controller="MASCO_DataTableController" description="Component for getting table data from server">
+
+    <ltng:require scripts="{!$Resource.MASResources + '/scripts/jquery-3.3.1.min.js'}"/>
+
+    <aura:attribute name="pageSet" type="List" default="[{'pageNumber':1, 'pageSize':10}]" description="Pagination parameters"/>
+    <aura:attribute name="sortSet" type="Object" description="Sorting parameters"/>
+    <aura:attribute name="sortingFields" type="Object" description="Fileds for sorting"/>
+    <aura:attribute name="filters" type="Object" description="Filter parameters"/>
+    <aura:attribute name="id" type="string" default="" description="Id of pagination component"/>
+
+    <aura:attribute name="objects" type="List" description="List of result objects"/>
+    <aura:attribute name="totalCount" type="integer" default="0" description="Total count of result items"/>
+
+    <aura:attribute name="wait" type="boolean" default="false" description="Flag for delayed loading"/>
+    <aura:handler name="init" value="{!this}" action="{!c.renderTable}"/>
+    <aura:handler event="c:MASCO_SortingEvent" action="{!c.sortBy}"/>
+    <aura:handler event="c:MASCO_PageChangeEvent" action="{!c.pageChange}"/>
+    <aura:handler name="change" value="{!v.filters}" action="{!c.renderTable}"/>
+    <aura:method name="refreshTable" action="{!c.renderTable}" />
+        {!v.body}
+</aura:component>

@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION" description="System Events">
+    <!-- Name of Event -->
+    <aura:attribute name="actionName" type="string"/>
+    <!-- List of Params -->
+    <aura:attribute name="parameters" type="List"/>
+</aura:event>

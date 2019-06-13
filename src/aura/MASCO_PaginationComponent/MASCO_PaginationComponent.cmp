@@ -1,0 +1,48 @@
+<aura:component description="Component for Pagination">
+    <aura:attribute name="id" type="string" default="" description="Id of component if screen has >1 pagination components"/>
+
+    <aura:attribute name="page" type="integer" description="Number of page"/>
+    <aura:attribute name="pageSize" type="integer" description="Count of items per page"/>
+    <aura:attribute name="totalCount" type="integer" description="Total count of items"/>
+
+    <aura:attribute name="next" type="boolean" description="Screen has next page"/>
+    <aura:attribute name="prev" type="boolean" description="Screen has previous page"/>
+    <aura:attribute name="pageCount" type="integer" description="Total count of pages"/>
+    <aura:attribute name="buttonList" type="List" description="List of page number buttons"/>
+
+    <aura:attribute name="displayPageInfo" type="boolean" default="true" description="Flag for show/hide info about pages on left side"/>
+
+    <aura:handler name="change" value="{!v.totalCount}" action="{!c.doInit}" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:if isTrue="{!v.pageCount>1}">
+        <div class="slds-m-top--x-small">
+
+            <!-- NEXT BUTTON -->
+            <ui:button class="slds-button slds-button--neutral slds-m-right--x-small slds-m-left--xx-small slds-float--right" press="{!c.Next}" disabled="{!v.next}" >
+                Next
+            </ui:button>
+
+            <!-- NUMBER BUTTONS -->
+            <aura:iteration items="{!v.buttonList}" var="button">
+                <aura:if isTrue="{!button.current}">
+                    <a data-href="{!button.value}" class="slds-button slds-button--brand slds-button--brand-alt slds-p-horizontal--xx-small slds-m-right--x-small slds-float--right" onclick="{!c.goToPage}" >{!button.label} </a>
+                    <aura:set attribute="else">
+                        <a data-href="{!button.value}" class="slds-button slds-button--neutral slds-p-horizontal--xx-small slds-m-right--x-small slds-float--right" onclick="{!c.goToPage}" >{!button.label} </a>
+                    </aura:set>
+                </aura:if>
+            </aura:iteration>
+
+            <!-- PREVIOUS BUTTON -->
+            <ui:button class="slds-button slds-button--neutral slds-m-right--x-small slds-float--right" press="{!c.Previous}" disabled="{!v.prev}">
+                Previous
+            </ui:button>
+
+            <!-- PAGE INFO -->
+            <aura:if isTrue="{!v.displayPageInfo}">
+                <span style="margin-top:0.4rem" class="slds-float--left">{!v.page} of {!v.pageCount}</span>
+            </aura:if>
+
+        </div>
+    </aura:if>
+</aura:component>

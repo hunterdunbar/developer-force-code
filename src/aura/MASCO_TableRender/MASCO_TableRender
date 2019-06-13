@@ -1,0 +1,10 @@
+({
+    /**
+     * Allow to render table after Render Component
+     * @param cmp
+     */
+    afterRender: function (cmp) {
+        this.superAfterRender();
+        cmp.set("v.allow", true);
+    }
+})

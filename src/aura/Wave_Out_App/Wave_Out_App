@@ -1,0 +1,9 @@
+<aura:application access="GLOBAL" extends="ltng:outApp" >
+	<aura:text value="Some Text"></aura:text>
+    <aura:dependency resource="ui:button"/>
+    <html>
+    <body>
+    <p>Hello World</p>    
+    </body>
+    </html>
+</aura:application>

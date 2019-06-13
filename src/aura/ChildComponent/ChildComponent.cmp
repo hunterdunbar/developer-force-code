@@ -1,0 +1,6 @@
+<aura:component >
+	<aura:method name="HuntersMethod">
+        <aura:attribute name="recordId" type="String"/>
+        <aura:attribute name="message" type="String"/>    
+    </aura:method>
+</aura:component>

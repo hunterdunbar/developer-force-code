@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event for change sorting">
+    <aura:attribute name="sortingField" type="string" description="Field for sort"/>
+    <aura:attribute name="asc" type="boolean" description="Sorting direction"/>
+</aura:event>

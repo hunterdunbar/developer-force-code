@@ -1,0 +1,394 @@
+<aura:component controller="MAS_SummerPlanController" implements="forceCommunity:availableForAllPageTypes"
+                access="global" description="Component for Manage Summer Plan records"
+                extends="c:MASCO_SObjectListManager">
+
+    <!-- DETAIL VIEW PARAMETERS -->
+    <aura:attribute name="summerPlan" type="MAS_Summer_Plan__c"
+                    default="{ 'sobjectType': 'MAS_Summer_Plan__c' }"
+                    description="Summer Plan object for detail view"/>
+
+    <aura:attribute name="summerPlanId" type="String" default=""
+                    description="Id of Summer Plan in detail view"/>
+
+    <aura:attribute name="summerPlanType" type="String" default="1"
+                    description="Type of Summer Plan in detail view (1 or 2)"/>
+
+    <aura:attribute name="userRole" type="String" default="Student"
+                    description="User Role (Student/Advisor)"/>
+
+    <aura:attribute name="readOnly" type="String" default="true"
+                    description="Readonly fields (for Advisor)"/>
+
+
+    <!-- DATATABLE PARAMETERS -->
+    <aura:attribute name="wait" type="boolean" default="true" description="Flag for delayed loading"/>
+    <aura:attribute name="objectName" type="string" default="MAS_Summer_Plan__c"
+                    description="Object name for SObjectListManager"/>
+    <aura:attribute name="filterCode" type="string" default="SummerPlan"
+                    description="Filter Code for SObjectListManager"/>
+    <aura:attribute name="pageSet" type="List" default="[{'pageNumber':1, 'pageSize':50}]"
+                    description="Page Set for SObjectListManager"/>
+
+    <aura:attribute name="fieldSet" type="List" default="[{'name' : 'Id'},
+    {'name' : 'MAS_Student__r.Id'},
+    {'name' : 'MAS_Student__r.Name'},
+    {'name' : 'MAS_Status__c'},
+    {'name' : 'MAS_Title__c'}]"/>
+
+    <aura:attribute name="fieldSetForTable" type="List" default="[
+            {'name': 'studentName', 'label': 'Name', 'sortable': true},
+            {
+                'name': 'sp1Title',
+                'label': 'Summer Plan 1',
+                'sortable': false,
+                'type' : 'realLink',
+                'link': 'summer-plans',
+                'staticName' : 'View Summer Plan',
+                'dataField': 'studentId',
+                'customParams' : [{'name' : 'type', 'value' : '1'}]
+            },
+            {'name': 'sp1Status', 'label': 'Summer Plan 1 Status', 'sortable': false},
+            {
+                'name': 'sp2Title',
+                'label': 'Summer Plan 2',
+                'sortable': false,
+                'type' : 'realLink',
+                'link': 'summer-plans',
+                'staticName' : 'View Summer Plan',
+                'dataField': 'studentId',
+                'customParams' : [{'name' : 'type', 'value' : '2'}]
+            },
+            {'name': 'sp2Status', 'label': 'Summer Plan 2 Status', 'sortable': false}
+        ]" description="Field Set for table"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+
+    <!-- TABLE VIEW FOR ADVISOR -->
+    <aura:if isTrue="{!and(v.userRole=='Advisor', v.summerPlanId=='')}">
+
+
+        <!-- ADVISOR TABLE DETAIL PANEL -->
+        <div class="slds-page-header slds-p-top--none">
+            <div class="slds-grid slds-page-header__detail-row bordered slds-p-left--x-large slds-m-top--none">
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Plan of Study Status">Plan
+                        of Study
+                        Status</p>
+                    <p class="slds-text-body--regular slds-truncate"
+                       title="">Not Started</p>
+                </div>
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Student Advisor">Student
+                        Advisor</p>
+                    <p class="slds-text-body--regular"
+                       title="">John Anderson</p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- DATATABLE -->
+        <div class="mas-body-layout">
+            <span class="slds-text-heading_large">MY STUDENTS</span>
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-m-top--large">
+                <thead>
+                <tr class="slds-text-title--caps">
+                    <c:MASCO_SortingComponent fieldSet="{!v.fieldSetForTable}"/>
+                </tr>
+                </thead>
+                <c:MASCO_TableRender objectSet="{!v.objects}"
+                                     fieldSet="{!v.fieldSetForTable}" pageSet="{!v.pageSet}"/>
+            </table>
+            <div class="slds-m-around--medium">
+                <c:MASCO_PaginationComponent page="{!v.pageSet[0].pageNumber}" pageSize="{!v.pageSet[0].pageSize}"
+                                             totalCount="{!v.totalCount}"/>
+            </div>
+        </div>
+    </aura:if>
+
+
+    <!-- DETAIL VIEW -->
+    <aura:if isTrue="{!v.summerPlanId!=''}">
+
+        <!-- SUMMER PLAN STATUS -->
+        <div class="slds-page-header slds-p-top--none">
+            <div class="slds-grid slds-page-header__detail-row bordered slds-p-left--x-large slds-m-top--none">
+                <div class="slds-col slds-size--1-of-6">
+                    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Summer Plan Status">
+                        Summer Plan Status
+                    </p>
+                    <p class="slds-text-body--regular slds-truncate"
+                       title="{!v.summerPlan.MAS_Status__c ? v.summerPlan.MAS_Status__c : 'Unreviewed'}">
+                            {!v.summerPlan.MAS_Status__c ? v.summerPlan.MAS_Status__c : 'Unreviewed'}
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- TABS BLOCK -->
+        <div class="slds-tabs_default">
+            <ul class="slds-tabs_default__nav slds-p-left--x-large" role="tablist">
+                <li class="{!'slds-tabs_default__item' + (v.summerPlanType == '1' ?  ' slds-is-active' : '')}"
+                    title="Summer 1" role="presentation"><a
+                        class="slds-tabs_default__link"
+                        href="{!'#summer-plans?' + (v.userRole == 'Advisor' ? 'id=' + v.summerPlan.MAS_Student__c + '&amp;' : '') + 'type=1'}"
+                        role="tab" tabindex="0"
+                        aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Summer 1</a></li>
+                <li class="{!'slds-tabs_default__item' + (v.summerPlanType == '2' ?  ' slds-is-active' : '')}"
+                    title="Summer 2" role="presentation"><a
+                        class="slds-tabs_default__link"
+                        href="{!'#summer-plans?' + (v.userRole == 'Advisor' ? 'id=' + v.summerPlan.MAS_Student__c + '&amp;' : '') + 'type=2'}"
+                        role="tab" tabindex="-1"
+                        aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">Summer 2</a></li>
+            </ul>
+        </div>
+
+
+        <!-- CONTENT BLOCK -->
+        <div class="mas-body-layout">
+            <div class="slds-grid slds-size--1-of-1">
+
+
+                <!-- FORM -->
+                <div class="slds-col slds-m-top--medium slds-p-right--large slds-size--2-of-3">
+
+
+                    <!-- FORM TITLE -->
+                    <aura:if isTrue="{!v.userRole=='Advisor'}">
+                        <span class="slds-text-heading_large">Review Summer Plan</span>
+                    </aura:if>
+                    <aura:if isTrue="{!v.userRole=='Student'}">
+                        <span class="slds-text-heading_large">Submit Your Summer Plan</span>
+                    </aura:if>
+
+
+                    <div class="slds-form slds-form_compound plan-of-study-form slds-m-top--medium">
+                        <fieldset class="slds-form-element">
+                            <div class="slds-form-element__group">
+                                <div class="slds-form-element__row">
+                                    <div class="slds-form-element slds-size_1-of-2">
+                                        <label class="slds-form-element__label" for="MAS_Student__r">Student
+                                            Name</label>
+                                        <div class="slds-form-element__control">
+                                            <ui:inputText change="" disabled="true"
+                                                          aura:id="MAS_Student__r"
+                                                          value="{!v.summerPlan.MAS_Student__r.Name}"
+                                                          class="slds-input"/>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element slds-size_1-of-2">
+                                        <label class="slds-form-element__label" for="MAS_Advisor__r">Advisor
+                                            Name</label>
+                                        <div class="slds-form-element__control">
+                                            <ui:inputText change="" disabled="true"
+                                                          aura:id="MAS_Advisor__r"
+                                                          value="{!v.summerPlan.MAS_Advisor__r.Name}"
+                                                          class="slds-input"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="slds-form-element">
+                            <legend class="slds-form-element__legend slds-form-element__label">Please choose any
+                                relevant option below for yout Submmer Plans:
+                            </legend>
+
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size_1-of-2">
+                                    <div class="slds-form-element__control">
+                              <span class="slds-checkbox">
+                                <input type="checkbox" disabled="{!v.readOnly}" name="default"
+                                       id="MAS_1_Staying_at_MIT__c"
+                                       checked="{!v.summerPlan.MAS_1_Staying_at_MIT__c}"/>
+                                <label class="slds-checkbox__label" for="MAS_1_Staying_at_MIT__c">
+                                  <span class="slds-checkbox_faux"></span>
+                                  <span class="slds-form-element__label">
+                                      I will register at MIT for the summer and continue my research. I am requesting a Summer RA.
+                                  </span>
+                                </label>
+                              </span>
+                                        <span class="slds-checkbox">
+                                <input type="checkbox" disabled="{!v.readOnly}" name="default" id="MAS_2_Leaving_MIT__c"
+                                       checked="{!v.summerPlan.MAS_2_Leaving_MIT__c}"/>
+                                <label class="slds-checkbox__label" for="MAS_2_Leaving_MIT__c">
+                                  <span class="slds-checkbox_faux"></span>
+                                  <span class="slds-form-element__label">
+                                      I will leave for the summer and not register at MIT. I will not have a Summer RA.
+                                  </span>
+                                </label>
+                              </span>
+
+                                        <span class="slds-checkbox">
+                                <input type="checkbox" disabled="{!v.readOnly}" name="default" id="MAS_3_Complicated__c"
+                                       checked="{!v.summerPlan.MAS_3_Complicated__c}"/>
+                                <label class="slds-checkbox__label" for="MAS_3_Complicated__c">
+                                  <span class="slds-checkbox_faux"></span>
+                                  <span class="slds-form-element__label">
+                                      It`s complicated! I`ll explain below.
+                                  </span>
+                                </label>
+                              </span>
+
+                                        <span class="slds-checkbox">
+                                <input type="checkbox" disabled="{!v.readOnly}" name="default" id="MAS_4_Graduating__c"
+                                       checked="{!v.summerPlan.MAS_4_Graduating__c}"/>
+                                <label class="slds-checkbox__label" for="MAS_4_Graduating__c">
+                                  <span class="slds-checkbox_faux"></span>
+                                  <span class="slds-form-element__label">
+                                      I`m graduating in June. Bye!
+                                  </span>
+                                </label>
+                              </span>
+                                    </div>
+                                </div>
+
+                                <div class="slds-form-element slds-size_1-of-2">
+                                    <div class="slds-form-element">
+                                        <label class="slds-form-element__label" for="MAS_10_Thesis_Situation__c">I am
+                                            finishing my Master
+                                            thesis and have been accepted to the MAS Doctoral program. If this applies
+                                            to you, please choose an option.</label>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-select_container">
+                                                <select disabled="{!v.readOnly}"
+                                                        class="slds-select" id="MAS_10_Thesis_Situation__c">
+                                                    <option value="">Select an Option</option>
+                                                    <option value="June Degree/June Doctoral"
+                                                            selected="{!v.summerPlan.MAS_10_Thesis_Situation__c == 'June Degree/June Doctoral'}">
+                                                        I wil be on the June degree list and begin the Doctoral program
+                                                        in June (my advisor approves)
+                                                    </option>
+                                                    <option value="June Degree/Sept Doctoral"
+                                                            selected="{!v.summerPlan.MAS_10_Thesis_Situation__c == 'June Degree/Sept Doctoral'}">
+                                                        I wil be on the June degree list and begin the Doctoral program
+                                                        in September. I will enjoy the break during the summer!
+                                                    </option>
+                                                    <option value="Sept Degree/Sept Doctoral"
+                                                            selected="{!v.summerPlan.MAS_10_Thesis_Situation__c == 'Sept Degree/Sept Doctoral'}">
+                                                        I wil be on the September
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label" for="MAS_5_Plans__c">Let us know about your
+                                plans.</label>
+                            <div class="slds-form-element__control">
+                                <ui:inputTextArea disabled="{!v.readOnly}"
+                                                  value="{!v.summerPlan.MAS_5_Plans__c}"></ui:inputTextArea>
+                            </div>
+                        </div>
+
+
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label" for="MAS_6_Fellowship_Info__c">If you have a
+                                fellowship,
+                                please provide more information below.</label>
+                            <div class="slds-form-element__control">
+                                <ui:inputTextArea disabled="{!v.readOnly}"
+                                                  value="{!v.summerPlan.MAS_6_Fellowship_Info__c}"></ui:inputTextArea>
+                            </div>
+                        </div>
+
+                        <aura:if isTrue="{!or(v.summerPlan.MAS_Student__r.MAS_Citizenship_Status__c == 'Presumed International',
+                                        v.summerPlan.MAS_Student__r.MAS_Citizenship_Status__c == 'International',
+                                        v.summerPlan.MAS_Student__r.MAS_Citizenship_Status__c == 'Unknown')}">
+
+                            <div class="slds-form-element__control">
+                              <span class="slds-checkbox">
+                                <input type="checkbox" disabled="{!v.readOnly}" name="default"
+                                       id="MAS_7_Getting_CPTOPT__c"
+                                       checked="{!v.summerPlan.MAS_7_Getting_CPTOPT__c}"/>
+                                <label class="slds-checkbox__label" for="MAS_7_Getting_CPTOPT__c">
+                                  <span class="slds-checkbox_faux"></span>
+                                  <span class="slds-form-element__label">
+                                  In the progress of getting CPT/OPT
+                                  </span>
+                                </label>
+                              </span>
+                                <span class="slds-checkbox">
+                                <input type="checkbox" disabled="{!v.readOnly}" name="default"
+                                       id="MAS_8_Received_CPTOPT__c"
+                                       checked="{!v.summerPlan.MAS_8_Received_CPTOPT__c}"/>
+                                <label class="slds-checkbox__label" for="MAS_8_Received_CPTOPT__c">
+                                  <span class="slds-checkbox_faux"></span>
+                                  <span class="slds-form-element__label">
+
+                                  I have successfully received CPT/OPT</span>
+                                </label>
+                              </span>
+
+                                <span class="slds-checkbox">
+                                <input type="checkbox" disabled="{!v.readOnly}" name="default"
+                                       id="MAS_9_NotStarted_CPTOPT__c"
+                                       checked="{!v.summerPlan.MAS_9_NotStarted_CPTOPT__c}"/>
+                                <label class="slds-checkbox__label" for="MAS_9_NotStarted_CPTOPT__c">
+                                  <span class="slds-checkbox_faux"></span>
+                                  <span class="slds-form-element__label">
+                                  I have not started the process for either CPT/OPT
+                                  </span>
+                                </label>
+                              </span>
+                            </div>
+                        </aura:if>
+
+
+                        <!-- ADVISOR ACTION BUTTONS -->
+                        <aura:if isTrue="{!v.userRole=='Advisor'}">
+                            <a href="#summer-plans"
+                               class="slds-button slds-button_neutral slds-m-top_large slds-m-right_medium">
+                                Back to List
+                            </a>
+                            <aura:if isTrue="{!v.summerPlan.MAS_Status__c == 'Submitted'}">
+                                <button class="slds-button slds-button_brand slds-m-top_large slds-m-right_medium"
+                                        onclick="{!c.approvePlan}">
+                                    Acknowledge
+                                </button>
+                            </aura:if>
+                        </aura:if>
+
+
+                        <!-- STUDENT ACTION BUTTONS -->
+                        <aura:if isTrue="{!and(v.userRole=='Student', v.summerPlan.MAS_Status__c == 'Unreviewed')}">
+                            <button class="slds-button slds-button_neutral slds-m-top_large slds-m-right_medium"
+                                    onclick="{!c.savePlan}">
+                                Save
+                            </button>
+                            <button class="slds-button slds-button_brand slds-m-top_large slds-m-right_medium"
+                                    onclick="{!c.submitPlan}">
+                                Submit
+                            </button>
+                        </aura:if>
+                    </div>
+                </div>
+
+
+                <!-- FORCE CHATTER BLOCK -->
+                <div class="slds-col slds-m-top--medium slds-p-right--large slds-size--1-of-3">
+                    <aura:if isTrue="{!v.summerPlan.Id}">
+                        <span class="slds-text-heading_large">Feed</span>
+                        <div class="slds-m-top--large slds-p-top--small">
+
+                            <aura:if isTrue="{!v.userRole=='Advisor'}">
+                                <forceChatter:publisher context="RECORD" recordId="{!v.summerPlan.Id}"/>
+                            </aura:if>
+                            <forceChatter:feed type="Record" subjectId="{!v.summerPlan.Id}"/>
+                        </div>
+
+                    </aura:if>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+</aura:component>
