@@ -9,6 +9,7 @@ public class HUNTER_SERGEY_GITCOMMIT{
     public static void newMethod(){
     
         System.debug('Hello World the Second Time');
+        System.debug('TEST TEST TEST');
     
     }
 
