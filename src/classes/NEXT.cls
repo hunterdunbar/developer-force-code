@@ -1,9 +1,9 @@
 public class NEXT extends Practices {
 
-
+    //public String name = 'NEXT';
     
     public NEXT(){
-        
+        this.name = 'NEXT';
     }
     
    
